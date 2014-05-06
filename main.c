@@ -21,9 +21,10 @@
 #define ALL  5
 
 /**
- * Size of square area to render in.
+ * Size of area to render in.
  */
-unsigned int screen_size;
+unsigned int screen_height;
+unsigned int screen_width;
 
 /**
  * Render a fractal to the screen, colouring by how many points per
@@ -37,32 +38,34 @@ static void render_fractal(bool (*in_fractal) (complex double),
   double range_im = cimag(bottomright) - cimag(topleft);
 
   // Figure out how many complex numbers per Y/X point we have
-  unsigned int perpoint = (unsigned int)((fabs(range_re) * RESOLUTION) / screen_size);
+  unsigned int perx = (unsigned int)((fabs(range_re) * RESOLUTION) / screen_width);
+  unsigned int pery = (unsigned int)((fabs(range_im) * RESOLUTION) / screen_height);
 
   // Calculate the rendering step
-  double step = 1.0 / perpoint;
+  double stepx = 1.0 / perx;
+  double stepy = 1.0 / pery;
 
   //printf("%f, %f, %i, %f\n", range_re, range_im, perpoint, step);
 
   // Compute the fractal
-  for(unsigned int y = 0; y < screen_size; y ++) {
-    for(unsigned int x = 0; x < screen_size; x ++) {
+  for(unsigned int y = 0; y < screen_height; y ++) {
+    for(unsigned int x = 0; x < screen_width; x ++) {
       // Compute how many points for this "pixel" are in the fractal.
       unsigned int in = 0;
-      double re_off = range_re * ((double)x / (double)screen_size);
-      double im_off = range_im * ((double)y / (double)screen_size);
+      double re_off = range_re * ((double)x / (double)screen_width);
+      double im_off = range_im * ((double)y / (double)screen_height);
       double complex base = topleft + re_off + im_off * I;
 
-      for(unsigned int py = 0; py < perpoint; py ++) {
-        for(unsigned int px = 0; px < perpoint; px ++) {
-          double complex point = px * step + py * step * I;
+      for(unsigned int py = 0; py < pery; py ++) {
+        for(unsigned int px = 0; px < perx; px ++) {
+          double complex point = px * stepx + py * stepy * I;
           if(in_fractal(base + point))
             in ++;
         }
       }
 
       // Get the fraction of points which are in the fractal
-      double in_frac = (float)in / (float)(perpoint * perpoint);
+      double in_frac = (float)in / (float)(perx * pery);
 
       // Select the colour
       unsigned int cpair = ALL;
@@ -107,7 +110,8 @@ int main() {
   getmaxyx(mainwin, max_y, max_x);
 
   // Set size of rendering area
-  screen_size = (unsigned int) ((max_y < max_x) ? max_y : max_x);
+  screen_height = (unsigned int)max_y;
+  screen_width = (unsigned int)max_x;
 
   // Initialise colours
   init_pair(NONE, COLOR_WHITE,   COLOR_BLACK);
