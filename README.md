@@ -6,6 +6,18 @@ ncurses. Currently the only fractal it supports is the Mandlebrot set,
 but adding more (assuming they don't require user input) shouldn't be
 tricky.
 
+Invocation
+----------
+
+    ./nfrac [fractal] [fractal args...]
+
+Current supported fractals are:
+
+ - mandlebrot: no arguments
+ - multibrot: 1 float argument
+
+If no fractal is given, Mandlebrot is assumed.
+
 Controls
 --------
 

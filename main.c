@@ -2,6 +2,7 @@
 #include <complex.h>
 #include <stdbool.h>
 #include <math.h>
+#include <string.h>
 
 #include "mandlebrot.h"
 
@@ -129,7 +130,32 @@ static void render_fractal(bool (*in_fractal) (complex double, const char *[], i
   }
 }
 
-int main() {
+int main(int argc, const char* argv[]) {
+  // Get fractal renderer
+  bool (*renderer) (complex double, const char *[], int) = NULL;
+  const char** frargv = &argv[1];
+  int frargc = argc - 1;
+
+  if(frargc > 0) {
+    frargc --;
+
+    if(strcmp("mandlebrot", frargv[0]) == 0) {
+      renderer = &in_mandlebrot;
+      frargv ++;
+    } else if(strcmp("multibrot", frargv[0]) == 0) {
+      renderer = &in_multibrot;
+      frargv ++;
+
+      if(frargc == 0) {
+        fprintf(stderr, "'multibrot' takes an argument.\n");
+        return 2;
+      }
+    } else {
+      fprintf(stderr, "Unknown fractal: %s\n", frargv[0]);
+      return 1;
+    }
+  }
+
   MEVENT event;
   WINDOW * mainwin = initscr();
   start_color();
@@ -171,7 +197,7 @@ int main() {
     clear();
 
     // Render the fractal
-    render_fractal(&in_mandlebrot, NULL, 0);
+    render_fractal(renderer, frargv, frargc);
 
     // Display scale info
     char buf[screen_width];
