@@ -112,11 +112,23 @@ int main() {
   init_pair(LOTS, COLOR_YELLOW,  COLOR_BLACK);
   init_pair(ALL,  COLOR_GREEN,   COLOR_BLACK);
 
-  // Render a fractal
-  render_fractal(&in_mandlebrot,
-                 -2.0 + 2.0 * I,
-                 2.0 - 2.0 * I);
-  getch();
+  // Render the fractal
+  double complex topleft = -2.0 + 2.0 * I;
+  double complex bottomright = 2.0 - 2.0 * I;
+  bool looping = true;
+  while(looping) {
+    render_fractal(&in_mandlebrot, topleft, bottomright);
+
+    int ch = getch();
+    switch(ch) {
+    case 'q':
+      looping = false;
+      break;
+
+    default:
+      break;
+    }
+  }
 
   curs_set(1);
   nl();
