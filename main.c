@@ -87,6 +87,7 @@ static void render_fractal(bool (*in_fractal) (complex double),
 }
 
 int main() {
+  MEVENT event;
   WINDOW * mainwin = initscr();
   start_color();
   cbreak();
@@ -95,6 +96,7 @@ int main() {
   intrflush(stdscr, false);
   keypad(stdscr, true);
   curs_set(0);
+  mousemask(ALL_MOUSE_EVENTS, NULL);
 
   // Get terminal size
   int max_y, max_x;
@@ -121,6 +123,14 @@ int main() {
 
     int ch = getch();
     switch(ch) {
+    case KEY_MOUSE:
+      if(getmouse(&event) == OK) {
+        if(event.bstate & BUTTON1_PRESSED) {
+          // Do something
+        }
+      }
+      break;
+
     case 'q':
       looping = false;
       break;
