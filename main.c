@@ -38,7 +38,7 @@ double complex bottomright = 5.0 - 5.0 * I;
  * Helper function: get the complex coordinates of the top-left of the
  * given pixel
  */
-static double complex pixel_topleft(unsigned int y, unsigned int x) {
+static double complex pixel_topleft(int y, int x) {
   // Get the size of the grid
   double range_re = creal(bottomright) - creal(topleft);
   double range_im = cimag(bottomright) - cimag(topleft);
@@ -71,7 +71,7 @@ static void render_fractal(bool (*in_fractal) (complex double)) {
       unsigned int in = 0;
 
       // Get the corner of this pixel
-      double complex base = pixel_topleft(y, x);
+      double complex base = pixel_topleft((int)y, (int)x);
 
       for(unsigned int py = 0; py <= RESOLUTION; py ++) {
         for(unsigned int px = 0; px <= RESOLUTION; px ++) {
@@ -141,7 +141,7 @@ int main() {
 
   // Store mouse selection coordinates
   bool selected = false;
-  unsigned int sely, selx;
+  int sely, selx;
 
   bool looping = true;
   while(looping) {
@@ -179,25 +179,22 @@ int main() {
     case KEY_MOUSE:
       if(getmouse(&event) == OK) {
         if(event.bstate & BUTTON1_CLICKED) {
-          unsigned int evex = (unsigned int) event.x;
-          unsigned int evey = (unsigned int) event.y;
-
           if(selected) {
-            if(evex == selx && evey == sely) {
+            if(event.x == selx && event.y == sely) {
               // Unselect by clicking the selected point
               selected = false;
             } else {
               // Otherwise zoom!
               double complex newtl = pixel_topleft(sely, selx);
-              double complex newbr = pixel_topleft(evey, evex);
+              double complex newbr = pixel_topleft(event.y, event.x);
               topleft = newtl;
               bottomright = newbr;
               selected = false;
             }
           } else {
             // Otherwise select a point
-            selx = evex;
-            sely = evey;
+            selx = event.x;
+            sely = event.y;
             selected = true;
           }
         }
