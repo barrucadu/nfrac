@@ -45,8 +45,6 @@ static void render_fractal(bool (*in_fractal) (complex double),
   double stepx = 1.0 / perx;
   double stepy = 1.0 / pery;
 
-  //printf("%f, %f, %i, %f\n", range_re, range_im, perpoint, step);
-
   // Compute the fractal
   for(unsigned int y = 0; y < screen_height; y ++) {
     for(unsigned int x = 0; x < screen_width; x ++) {
@@ -87,11 +85,8 @@ static void render_fractal(bool (*in_fractal) (complex double),
       // Render the point
       attron(COLOR_PAIR(cpair));
       mvaddch(y, x, render);
-      //mvaddch(y, x, '0' + in);
       attroff(COLOR_PAIR(cpair));
-      //printf("(%f, %f) ", re_off, im_off);
     }
-    //printf("\n");
   }
 }
 
