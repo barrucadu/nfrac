@@ -138,8 +138,8 @@ int main() {
   init_pair(SELECTED, COLOR_RED, COLOR_BLACK);
 
   // Render the fractal
-  double complex topleft = -2.0 + 2.0 * I;
-  double complex bottomright = 2.0 - 2.0 * I;
+  double complex topleft = -5.0 + 5.0 * I;
+  double complex bottomright = 5.0 - 5.0 * I;
 
   // Store mouse selection coordinates
   bool selected = false;
@@ -186,6 +186,12 @@ int main() {
           }
         }
       }
+      break;
+
+    case 'r':
+      topleft = -5.0 + 5.0 * I;
+      bottomright = 5.0 - 5.0 * I;
+      selected = false;
       break;
 
     case 'q':
