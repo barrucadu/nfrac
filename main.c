@@ -68,7 +68,8 @@ static double complex pixel_topleft(int y, int x) {
  * Render a fractal to the screen, colouring by how many points per
  * pixel are in the fractal.
  */
-static void render_fractal(bool (*in_fractal) (complex double)) {
+static void render_fractal(bool (*in_fractal) (complex double, const char *[], int),
+                           const char * frargv[], int frargn) {
   // Get the size of the grid
   double range_re = creal(bottomright) - creal(topleft);
   double range_im = cimag(bottomright) - cimag(topleft);
@@ -89,7 +90,7 @@ static void render_fractal(bool (*in_fractal) (complex double)) {
       for(unsigned int py = 0; py <= RESOLUTION; py ++) {
         for(unsigned int px = 0; px <= RESOLUTION; px ++) {
           double complex point = px * stepx + py * stepy * I;
-          if(in_fractal(base + point))
+          if(in_fractal(base + point, frargv, frargn))
             in ++;
         }
       }
@@ -170,7 +171,7 @@ int main() {
     clear();
 
     // Render the fractal
-    render_fractal(&in_mandlebrot);
+    render_fractal(&in_mandlebrot, NULL, 0);
 
     // Display scale info
     char buf[screen_width];

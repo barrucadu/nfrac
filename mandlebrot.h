@@ -12,6 +12,7 @@
 /**
  * Check if a point is in the Mandlebrot set.
  */
-bool in_mandlebrot(double complex z);
+bool in_mandlebrot(double complex z, const char* argv[], int argn);
+bool in_multibrot(double complex z, const char *argv[], int argn);
 
 #endif
