@@ -11,7 +11,7 @@
 #define RESOLUTION 5
 
 /**
- * Rendering colour pairs
+ * Rendering colour pairs.
  */
 #define NONE 0
 #define FEW  1
@@ -20,7 +20,15 @@
 #define LOTS 4
 #define ALL  5
 
-#define SELECTED 6
+#define NONE_B 6
+#define FEW_B  7
+#define SOME_B 8
+#define MANY_B 9
+#define LOTS_B 10
+#define ALL_B  11
+
+#define BG 98
+#define BG_B 99
 
 /**
  * Size of area to render in.
@@ -38,6 +46,11 @@ double complex bottomright = 5.0 - 5.0 * I;
  * Whether to hide the background or not
  */
 bool hide = false;
+
+/**
+ * Whether to use bright colours or not
+ */
+bool bright = false;
 
 /**
  * Helper function: get the complex coordinates of the top-left of the
@@ -90,29 +103,32 @@ static void render_fractal(bool (*in_fractal) (complex double)) {
       double in_frac = (double)in / (double)(RESOLUTION * RESOLUTION);
 
       // Select the colour
-      unsigned int cpair = ALL;
+      unsigned int cpair = bright ? ALL_B : ALL;
       if(in_frac == 0) {
-        cpair = NONE;
+        cpair = bright ? NONE_B : NONE;
       } else if(in_frac <= 0.2) {
-        cpair = FEW;
+        cpair = bright ? FEW_B : FEW;
       } else if(in_frac <= 0.4) {
-        cpair = SOME;
+        cpair = bright ? SOME_B : SOME;
       } else if(in_frac <= 0.6) {
-        cpair = MANY;
+        cpair = bright ? MANY_B : MANY;
       } else if(in_frac <= 0.8) {
-        cpair = LOTS;
+        cpair = bright ? LOTS_B : LOTS;
       }
 
       // Select the char
       char render = (in_frac < 0.5) ? '.' : '#';
 
       // Render the point
-      if(cpair == NONE && hide)
-        continue;
-
-      attron(COLOR_PAIR(cpair));
-      mvaddch(y, x, render);
-      attroff(COLOR_PAIR(cpair));
+      if((cpair == NONE || cpair == NONE_B) && hide) {
+          attron(COLOR_PAIR(bright ? BG_B : BG));
+          mvaddch(y, x, '-');
+          attroff(COLOR_PAIR(bright ? BG_B : BG));
+      } else {
+        attron(COLOR_PAIR(cpair));
+        mvaddch(y, x, render);
+        attroff(COLOR_PAIR(cpair));
+      }
     }
   }
 }
@@ -145,7 +161,15 @@ int main() {
   init_pair(LOTS, COLOR_YELLOW,  COLOR_BLACK);
   init_pair(ALL,  COLOR_GREEN,   COLOR_BLACK);
 
-  init_pair(SELECTED, COLOR_RED, COLOR_BLACK);
+  init_pair(NONE_B, COLOR_BLACK,   COLOR_WHITE);
+  init_pair(FEW_B,  COLOR_MAGENTA, COLOR_WHITE);
+  init_pair(SOME_B, COLOR_RED,     COLOR_WHITE);
+  init_pair(MANY_B, COLOR_YELLOW,  COLOR_WHITE);
+  init_pair(LOTS_B, COLOR_BLUE,    COLOR_WHITE);
+  init_pair(ALL_B,  COLOR_CYAN,    COLOR_WHITE);
+
+  init_pair(BG,   COLOR_BLACK, COLOR_BLACK);
+  init_pair(BG_B, COLOR_WHITE, COLOR_WHITE);
 
   bool looping = true;
   while(looping) {
@@ -156,9 +180,11 @@ int main() {
 
     // Display scale info
     char buf[screen_width];
-    snprintf(buf, screen_width, "From (%f + %fi) to (%f + %fi)",
+    snprintf(buf, screen_width, "From (%f + %fi) to (%f + %fi)%s%s",
              creal(topleft), cimag(topleft),
-             creal(bottomright), cimag(bottomright));
+             creal(bottomright), cimag(bottomright),
+             hide ? " [h]" : "",
+             bright ? " [b]" : "");
     move(screen_height, 0);
     clrtoeol();
     mvaddstr(screen_height, 0, buf);
@@ -211,6 +237,10 @@ int main() {
 
     case 'h':
       hide = !hide;
+      break;
+
+    case 'b':
+      bright = !bright;
       break;
 
     case KEY_MOUSE:

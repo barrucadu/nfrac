@@ -13,5 +13,6 @@ Controls
  - +/-: zoom in/out
  - click: centre on the selected point
  - h: hide the background dots
+ - b: toggle bright colours
  - r: reset to initial view
  - q: quit
