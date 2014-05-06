@@ -26,7 +26,7 @@ bool in_multibrot(double complex z, const char *argv[], int argn) {
   if(argn == 0) {
     d = 2.0;
   } else {
-    scanf(argv[0], "%lf", &d);
+    sscanf(argv[0], "%lf", &d);
   }
 
   double complex zi = z;
@@ -34,7 +34,7 @@ bool in_multibrot(double complex z, const char *argv[], int argn) {
   double im;
 
   for(unsigned int i = 0; i < MAX_ITERATIONS; i++) {
-    zi = cpow(zi, 2) + z;
+    zi = cpow(zi, d) + z;
     re = creal(zi);
     im = cimag(zi);
 
