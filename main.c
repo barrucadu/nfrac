@@ -174,8 +174,34 @@ int main() {
     clrtoeol();
     mvaddstr(screen_height, 0, buf);
 
+    double complex offset;
+
     int ch = getch();
     switch(ch) {
+    case KEY_DOWN:
+      offset = pixel_topleft(0, 0) - pixel_topleft(1, 0);
+      topleft += offset;
+      bottomright += offset;
+      break;
+
+    case KEY_UP:
+      offset = -(pixel_topleft(0, 0) - pixel_topleft(1, 0));
+      topleft += offset;
+      bottomright += offset;
+      break;
+
+    case KEY_RIGHT:
+      offset = pixel_topleft(0, 0) - pixel_topleft(0, 1);
+      topleft += offset;
+      bottomright += offset;
+      break;
+
+    case KEY_LEFT:
+      offset = -(pixel_topleft(0, 0) - pixel_topleft(0, 1));
+      topleft += offset;
+      bottomright += offset;
+      break;
+
     case KEY_MOUSE:
       if(getmouse(&event) == OK) {
         if(event.bstate & BUTTON1_CLICKED) {
