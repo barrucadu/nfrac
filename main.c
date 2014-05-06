@@ -29,6 +29,25 @@ unsigned int screen_height;
 unsigned int screen_width;
 
 /**
+ * Helper function: get the complex coordinates of the top-left of the
+ * given pixel
+ */
+static double complex pixel_topleft(double complex topleft,
+                                    double complex bottomright,
+                                    int y, int x) {
+  // Get the size of the grid
+  double range_re = creal(bottomright) - creal(topleft);
+  double range_im = cimag(bottomright) - cimag(topleft);
+
+  // Get the re and im offsets for the position
+  double re_off = range_re * ((double)x / (double)screen_width);
+  double im_off = range_im * ((double)y / (double)screen_height);
+
+  // Return the position
+  return topleft + re_off + im_off * I;
+}
+
+/**
  * Render a fractal to the screen, colouring by how many points per
  * pixel are in the fractal.
  */
@@ -48,9 +67,9 @@ static void render_fractal(bool (*in_fractal) (complex double),
     for(unsigned int x = 0; x < screen_width; x ++) {
       // Compute how many points for this "pixel" are in the fractal.
       unsigned int in = 0;
-      double re_off = range_re * ((double)x / (double)screen_width);
-      double im_off = range_im * ((double)y / (double)screen_height);
-      double complex base = topleft + re_off + im_off * I;
+
+      // Get the corner of this pixel
+      double complex base = pixel_topleft(topleft, bottomright, (int)y, (int)x);
 
       for(unsigned int py = 0; py <= RESOLUTION; py ++) {
         for(unsigned int px = 0; px <= RESOLUTION; px ++) {
@@ -145,9 +164,20 @@ int main() {
     case KEY_MOUSE:
       if(getmouse(&event) == OK) {
         if(event.bstate & BUTTON1_CLICKED) {
-          if(event.x == selx && event.y == sely) {
-            // Unselect by clicking the selected point
-            selected = false;
+          if(selected) {
+            if(event.x == selx && event.y == sely) {
+              // Unselect by clicking the selected point
+              selected = false;
+            } else {
+              // Otherwise zoom!
+              double complex newtl = pixel_topleft(topleft, bottomright,
+                                                   sely, selx);
+              double complex newbr = pixel_topleft(topleft, bottomright,
+                                                   event.y, event.x);
+              topleft = newtl;
+              bottomright = newbr;
+              selected = false;
+            }
           } else {
             // Otherwise select a point
             selx = event.x;
