@@ -7,7 +7,7 @@
 /**
  * Maximum number of iterations to use when computing if a point is in or not
  */
-#define MAX_ITERATIONS 1000
+#define MAX_ITERATIONS 100
 
 /**
  * Check if a point is in the Mandlebrot set.
