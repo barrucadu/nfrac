@@ -35,6 +35,11 @@ double complex topleft = -5.0 + 5.0 * I;
 double complex bottomright = 5.0 - 5.0 * I;
 
 /**
+ * Whether to hide the background or not
+ */
+bool hide = false;
+
+/**
  * Helper function: get the complex coordinates of the top-left of the
  * given pixel
  */
@@ -102,6 +107,9 @@ static void render_fractal(bool (*in_fractal) (complex double)) {
       char render = (in_frac < 0.5) ? '.' : '#';
 
       // Render the point
+      if(cpair == NONE && hide)
+        continue;
+
       attron(COLOR_PAIR(cpair));
       mvaddch(y, x, render);
       attroff(COLOR_PAIR(cpair));
@@ -145,6 +153,8 @@ int main() {
 
   bool looping = true;
   while(looping) {
+    clear();
+
     // Render the fractal
     render_fractal(&in_mandlebrot);
 
@@ -218,6 +228,10 @@ int main() {
       offset = (cimag(bottomright) - cimag(topleft)) / 4;
       topleft -= offset * I;
       bottomright += offset * I;
+      break;
+
+    case 'h':
+      hide = !hide;
       break;
 
     case KEY_MOUSE:
