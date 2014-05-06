@@ -20,6 +20,8 @@
 #define LOTS 4
 #define ALL  5
 
+#define SELECTED 6
+
 /**
  * Size of area to render in.
  */
@@ -114,19 +116,44 @@ int main() {
   init_pair(LOTS, COLOR_YELLOW,  COLOR_BLACK);
   init_pair(ALL,  COLOR_GREEN,   COLOR_BLACK);
 
+  init_pair(SELECTED, COLOR_RED, COLOR_BLACK);
+
   // Render the fractal
   double complex topleft = -2.0 + 2.0 * I;
   double complex bottomright = 2.0 - 2.0 * I;
+
+  // Store mouse selection coordinates
+  bool selected = false;
+  int sely, selx;
+
   bool looping = true;
   while(looping) {
+    // Render the fractal
     render_fractal(&in_mandlebrot, topleft, bottomright);
+
+    // Render a selection
+    if(selected) {
+      attron(COLOR_PAIR(SELECTED));
+      attron(A_BOLD);
+      mvaddch(sely, selx, '+');
+      attroff(A_BOLD);
+      attroff(COLOR_PAIR(SELECTED));
+    }
 
     int ch = getch();
     switch(ch) {
     case KEY_MOUSE:
       if(getmouse(&event) == OK) {
-        if(event.bstate & BUTTON1_PRESSED) {
-          // Do something
+        if(event.bstate & BUTTON1_CLICKED) {
+          if(event.x == selx && event.y == sely) {
+            // Unselect by clicking the selected point
+            selected = false;
+          } else {
+            // Otherwise select a point
+            selx = event.x;
+            sely = event.y;
+            selected = true;
+          }
         }
       }
       break;
