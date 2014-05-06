@@ -202,6 +202,24 @@ int main() {
       bottomright += offset;
       break;
 
+    case '+':
+      offset = (creal(bottomright) - creal(topleft)) / 4;
+      topleft += offset;
+      bottomright -= offset;
+      offset = (cimag(bottomright) - cimag(topleft)) / 4;
+      topleft += offset * I;
+      bottomright -= offset * I;
+      break;
+
+    case '-':
+      offset = (creal(bottomright) - creal(topleft)) / 4;
+      topleft -= offset;
+      bottomright += offset;
+      offset = (cimag(bottomright) - cimag(topleft)) / 4;
+      topleft -= offset * I;
+      bottomright += offset * I;
+      break;
+
     case KEY_MOUSE:
       if(getmouse(&event) == OK) {
         if(event.bstate & BUTTON1_CLICKED) {
