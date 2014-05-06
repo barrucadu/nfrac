@@ -8,7 +8,7 @@
 /**
  * Number of complex points to include per row/col
  */
-#define RESOLUTION 100
+#define RESOLUTION 5
 
 /**
  * Rendering colour pairs
@@ -37,13 +37,9 @@ static void render_fractal(bool (*in_fractal) (complex double),
   double range_re = creal(bottomright) - creal(topleft);
   double range_im = cimag(bottomright) - cimag(topleft);
 
-  // Figure out how many complex numbers per Y/X point we have
-  unsigned int perx = (unsigned int)((fabs(range_re) * RESOLUTION) / screen_width);
-  unsigned int pery = (unsigned int)((fabs(range_im) * RESOLUTION) / screen_height);
-
   // Calculate the rendering step
-  double stepx = 1.0 / perx;
-  double stepy = 1.0 / pery;
+  double stepx = (range_re / screen_width) / RESOLUTION;
+  double stepy = (range_im / screen_height) / RESOLUTION;
 
   // Compute the fractal
   for(unsigned int y = 0; y < screen_height; y ++) {
@@ -54,8 +50,8 @@ static void render_fractal(bool (*in_fractal) (complex double),
       double im_off = range_im * ((double)y / (double)screen_height);
       double complex base = topleft + re_off + im_off * I;
 
-      for(unsigned int py = 0; py < pery; py ++) {
-        for(unsigned int px = 0; px < perx; px ++) {
+      for(unsigned int py = 0; py <= RESOLUTION; py ++) {
+        for(unsigned int px = 0; px <= RESOLUTION; px ++) {
           double complex point = px * stepx + py * stepy * I;
           if(in_fractal(base + point))
             in ++;
@@ -63,7 +59,7 @@ static void render_fractal(bool (*in_fractal) (complex double),
       }
 
       // Get the fraction of points which are in the fractal
-      double in_frac = (double)in / (double)(perx * pery);
+      double in_frac = (double)in / (double)(RESOLUTION * RESOLUTION);
 
       // Select the colour
       unsigned int cpair = ALL;
