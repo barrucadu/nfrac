@@ -63,7 +63,7 @@ static void render_fractal(bool (*in_fractal) (complex double),
       }
 
       // Get the fraction of points which are in the fractal
-      double in_frac = (float)in / (float)(perx * pery);
+      double in_frac = (double)in / (double)(perx * pery);
 
       // Select the colour
       unsigned int cpair = ALL;
