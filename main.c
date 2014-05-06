@@ -29,12 +29,16 @@ unsigned int screen_height;
 unsigned int screen_width;
 
 /**
+ * Corners of screen
+ */
+double complex topleft = -5.0 + 5.0 * I;
+double complex bottomright = 5.0 - 5.0 * I;
+
+/**
  * Helper function: get the complex coordinates of the top-left of the
  * given pixel
  */
-static double complex pixel_topleft(double complex topleft,
-                                    double complex bottomright,
-                                    int y, int x) {
+static double complex pixel_topleft(unsigned int y, unsigned int x) {
   // Get the size of the grid
   double range_re = creal(bottomright) - creal(topleft);
   double range_im = cimag(bottomright) - cimag(topleft);
@@ -51,9 +55,7 @@ static double complex pixel_topleft(double complex topleft,
  * Render a fractal to the screen, colouring by how many points per
  * pixel are in the fractal.
  */
-static void render_fractal(bool (*in_fractal) (complex double),
-                           double complex topleft,
-                           double complex bottomright) {
+static void render_fractal(bool (*in_fractal) (complex double)) {
   // Get the size of the grid
   double range_re = creal(bottomright) - creal(topleft);
   double range_im = cimag(bottomright) - cimag(topleft);
@@ -69,7 +71,7 @@ static void render_fractal(bool (*in_fractal) (complex double),
       unsigned int in = 0;
 
       // Get the corner of this pixel
-      double complex base = pixel_topleft(topleft, bottomright, (int)y, (int)x);
+      double complex base = pixel_topleft(y, x);
 
       for(unsigned int py = 0; py <= RESOLUTION; py ++) {
         for(unsigned int px = 0; px <= RESOLUTION; px ++) {
@@ -124,7 +126,7 @@ int main() {
   getmaxyx(mainwin, max_y, max_x);
 
   // Set size of rendering area
-  screen_height = (unsigned int)max_y;
+  screen_height = (unsigned int)max_y - 1;
   screen_width = (unsigned int)max_x;
 
   // Initialise colours
@@ -137,18 +139,14 @@ int main() {
 
   init_pair(SELECTED, COLOR_RED, COLOR_BLACK);
 
-  // Render the fractal
-  double complex topleft = -5.0 + 5.0 * I;
-  double complex bottomright = 5.0 - 5.0 * I;
-
   // Store mouse selection coordinates
   bool selected = false;
-  int sely, selx;
+  unsigned int sely, selx;
 
   bool looping = true;
   while(looping) {
     // Render the fractal
-    render_fractal(&in_mandlebrot, topleft, bottomright);
+    render_fractal(&in_mandlebrot);
 
     // Render a selection
     if(selected) {
@@ -159,29 +157,47 @@ int main() {
       attroff(COLOR_PAIR(SELECTED));
     }
 
+    // Display scale info
+    char buf[screen_width];
+    if(selected) {
+      double complex pos = pixel_topleft(sely, selx);
+      snprintf(buf, screen_width, "From (%f + %fi) to (%f + %fi). Selected (%f + %fi)",
+               creal(topleft), cimag(topleft),
+               creal(bottomright), cimag(bottomright),
+               creal(pos), cimag(pos));
+    } else {
+      snprintf(buf, screen_width, "From (%f + %fi) to (%f + %fi)",
+               creal(topleft), cimag(topleft),
+               creal(bottomright), cimag(bottomright));
+    }
+    move(screen_height, 0);
+    clrtoeol();
+    mvaddstr(screen_height, 0, buf);
+
     int ch = getch();
     switch(ch) {
     case KEY_MOUSE:
       if(getmouse(&event) == OK) {
         if(event.bstate & BUTTON1_CLICKED) {
+          unsigned int evex = (unsigned int) event.x;
+          unsigned int evey = (unsigned int) event.y;
+
           if(selected) {
-            if(event.x == selx && event.y == sely) {
+            if(evex == selx && evey == sely) {
               // Unselect by clicking the selected point
               selected = false;
             } else {
               // Otherwise zoom!
-              double complex newtl = pixel_topleft(topleft, bottomright,
-                                                   sely, selx);
-              double complex newbr = pixel_topleft(topleft, bottomright,
-                                                   event.y, event.x);
+              double complex newtl = pixel_topleft(sely, selx);
+              double complex newbr = pixel_topleft(evey, evex);
               topleft = newtl;
               bottomright = newbr;
               selected = false;
             }
           } else {
             // Otherwise select a point
-            selx = event.x;
-            sely = event.y;
+            selx = evex;
+            sely = evey;
             selected = true;
           }
         }
