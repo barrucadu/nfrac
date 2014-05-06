@@ -147,10 +147,6 @@ int main() {
 
   init_pair(SELECTED, COLOR_RED, COLOR_BLACK);
 
-  // Store mouse selection coordinates
-  bool selected = false;
-  int sely, selx;
-
   bool looping = true;
   while(looping) {
     clear();
@@ -158,28 +154,11 @@ int main() {
     // Render the fractal
     render_fractal(&in_mandlebrot);
 
-    // Render a selection
-    if(selected) {
-      attron(COLOR_PAIR(SELECTED));
-      attron(A_BOLD);
-      mvaddch(sely, selx, '+');
-      attroff(A_BOLD);
-      attroff(COLOR_PAIR(SELECTED));
-    }
-
     // Display scale info
     char buf[screen_width];
-    if(selected) {
-      double complex pos = pixel_topleft(sely, selx);
-      snprintf(buf, screen_width, "From (%f + %fi) to (%f + %fi). Selected (%f + %fi)",
-               creal(topleft), cimag(topleft),
-               creal(bottomright), cimag(bottomright),
-               creal(pos), cimag(pos));
-    } else {
-      snprintf(buf, screen_width, "From (%f + %fi) to (%f + %fi)",
-               creal(topleft), cimag(topleft),
-               creal(bottomright), cimag(bottomright));
-    }
+    snprintf(buf, screen_width, "From (%f + %fi) to (%f + %fi)",
+             creal(topleft), cimag(topleft),
+             creal(bottomright), cimag(bottomright));
     move(screen_height, 0);
     clrtoeol();
     mvaddstr(screen_height, 0, buf);
@@ -237,24 +216,11 @@ int main() {
     case KEY_MOUSE:
       if(getmouse(&event) == OK) {
         if(event.bstate & BUTTON1_CLICKED) {
-          if(selected) {
-            if(event.x == selx && event.y == sely) {
-              // Unselect by clicking the selected point
-              selected = false;
-            } else {
-              // Otherwise zoom!
-              double complex newtl = pixel_topleft(sely, selx);
-              double complex newbr = pixel_topleft(event.y, event.x);
-              topleft = newtl;
-              bottomright = newbr;
-              selected = false;
-            }
-          } else {
-            // Otherwise select a point
-            selx = event.x;
-            sely = event.y;
-            selected = true;
-          }
+          double range_re = creal(bottomright) - creal(topleft);
+          double range_im = cimag(bottomright) - cimag(topleft);
+          double complex centre = pixel_topleft(event.y, event.x);
+          topleft = centre - (range_re / 2.0 + range_im / 2.0 * I);
+          bottomright = centre + range_re / 2.0 + range_im / 2.0 * I;
         }
       }
       break;
@@ -262,7 +228,6 @@ int main() {
     case 'r':
       topleft = -5.0 + 5.0 * I;
       bottomright = 5.0 - 5.0 * I;
-      selected = false;
       break;
 
     case 'q':

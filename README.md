@@ -11,7 +11,7 @@ Controls
 
  - arrows: move display
  - +/-: zoom in/out
- - click: zoom in to the selected rectangle
+ - click: centre on the selected point
  - h: hide the background dots
  - r: reset to initial view
  - q: quit
