@@ -19,16 +19,11 @@
 #define MANY 3
 #define LOTS 4
 #define ALL  5
+#define BG   6
 
-#define NONE_B 6
-#define FEW_B  7
-#define SOME_B 8
-#define MANY_B 9
-#define LOTS_B 10
-#define ALL_B  11
-
-#define BG 98
-#define BG_B 99
+static short colours_dark[7] = {0, 1, 2, 3, 4, 5, 6};
+static short colours_bright[7] = {7, 8, 9, 10, 11, 12, 13};
+static short *colours = &colours_dark[0];
 
 /**
  * Size of area to render in.
@@ -103,27 +98,27 @@ static void render_fractal(bool (*in_fractal) (complex double)) {
       double in_frac = (double)in / (double)(RESOLUTION * RESOLUTION);
 
       // Select the colour
-      unsigned int cpair = bright ? ALL_B : ALL;
+      short cpair = colours[ALL];
       if(in_frac == 0) {
-        cpair = bright ? NONE_B : NONE;
+        cpair = colours[NONE];
       } else if(in_frac <= 0.2) {
-        cpair = bright ? FEW_B : FEW;
+        cpair = colours[FEW];
       } else if(in_frac <= 0.4) {
-        cpair = bright ? SOME_B : SOME;
+        cpair = colours[SOME];
       } else if(in_frac <= 0.6) {
-        cpair = bright ? MANY_B : MANY;
+        cpair = colours[MANY];
       } else if(in_frac <= 0.8) {
-        cpair = bright ? LOTS_B : LOTS;
+        cpair = colours[LOTS];
       }
 
       // Select the char
       char render = (in_frac < 0.5) ? '.' : '#';
 
       // Render the point
-      if((cpair == NONE || cpair == NONE_B) && hide) {
-          attron(COLOR_PAIR(bright ? BG_B : BG));
-          mvaddch(y, x, '-');
-          attroff(COLOR_PAIR(bright ? BG_B : BG));
+      if(cpair == colours[NONE] && hide) {
+        attron(COLOR_PAIR(colours[BG]));
+        mvaddch(y, x, ' ');
+        attroff(COLOR_PAIR(colours[BG]));
       } else {
         attron(COLOR_PAIR(cpair));
         mvaddch(y, x, render);
@@ -154,22 +149,21 @@ int main() {
   screen_width = (unsigned int)max_x;
 
   // Initialise colours
-  init_pair(NONE, COLOR_WHITE,   COLOR_BLACK);
-  init_pair(FEW,  COLOR_CYAN,    COLOR_BLACK);
-  init_pair(SOME, COLOR_MAGENTA, COLOR_BLACK);
-  init_pair(MANY, COLOR_BLUE,    COLOR_BLACK);
-  init_pair(LOTS, COLOR_YELLOW,  COLOR_BLACK);
-  init_pair(ALL,  COLOR_GREEN,   COLOR_BLACK);
+  init_pair(colours_dark[NONE], COLOR_WHITE,   COLOR_BLACK);
+  init_pair(colours_dark[FEW],  COLOR_CYAN,    COLOR_BLACK);
+  init_pair(colours_dark[SOME], COLOR_MAGENTA, COLOR_BLACK);
+  init_pair(colours_dark[MANY], COLOR_BLUE,    COLOR_BLACK);
+  init_pair(colours_dark[LOTS], COLOR_YELLOW,  COLOR_BLACK);
+  init_pair(colours_dark[ALL],  COLOR_GREEN,   COLOR_BLACK);
+  init_pair(colours_dark[BG],   COLOR_BLACK,   COLOR_BLACK);
 
-  init_pair(NONE_B, COLOR_BLACK,   COLOR_WHITE);
-  init_pair(FEW_B,  COLOR_MAGENTA, COLOR_WHITE);
-  init_pair(SOME_B, COLOR_RED,     COLOR_WHITE);
-  init_pair(MANY_B, COLOR_YELLOW,  COLOR_WHITE);
-  init_pair(LOTS_B, COLOR_BLUE,    COLOR_WHITE);
-  init_pair(ALL_B,  COLOR_CYAN,    COLOR_WHITE);
-
-  init_pair(BG,   COLOR_BLACK, COLOR_BLACK);
-  init_pair(BG_B, COLOR_WHITE, COLOR_WHITE);
+  init_pair(colours_bright[NONE], COLOR_BLACK,   COLOR_WHITE);
+  init_pair(colours_bright[FEW],  COLOR_MAGENTA, COLOR_WHITE);
+  init_pair(colours_bright[SOME], COLOR_RED,     COLOR_WHITE);
+  init_pair(colours_bright[MANY], COLOR_YELLOW,  COLOR_WHITE);
+  init_pair(colours_bright[LOTS], COLOR_BLUE,    COLOR_WHITE);
+  init_pair(colours_bright[ALL],  COLOR_CYAN,    COLOR_WHITE);
+  init_pair(colours_bright[BG],   COLOR_RED,   COLOR_WHITE);
 
   bool looping = true;
   while(looping) {
@@ -241,6 +235,7 @@ int main() {
 
     case 'b':
       bright = !bright;
+      colours = bright ? &colours_bright[0] : &colours_dark[0];
       break;
 
     case KEY_MOUSE:
