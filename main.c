@@ -6,11 +6,6 @@
 #include "render.h"
 #include "mandlebrot.h"
 
-extern short colours_dark[7];
-extern short colours_bright[7];
-extern unsigned int screen_width;
-extern unsigned int screen_height;
-
 int main(int argc, const char* argv[]) {
   // Get fractal renderer
   double (*renderer) (complex double, const char *[], int) = &in_mandlebrot;
@@ -48,30 +43,8 @@ int main(int argc, const char* argv[]) {
   curs_set(0);
   mousemask(ALL_MOUSE_EVENTS, NULL);
 
-  // Get terminal size
-  int max_y, max_x;
-  getmaxyx(mainwin, max_y, max_x);
-
-  // Set size of rendering area
-  screen_height = (unsigned int)max_y - 1;
-  screen_width = (unsigned int)max_x;
-
   // Initialise colours
-  init_pair(colours_dark[NONE], COLOR_WHITE,   COLOR_BLACK);
-  init_pair(colours_dark[FEW],  COLOR_CYAN,    COLOR_BLACK);
-  init_pair(colours_dark[SOME], COLOR_MAGENTA, COLOR_BLACK);
-  init_pair(colours_dark[MANY], COLOR_BLUE,    COLOR_BLACK);
-  init_pair(colours_dark[LOTS], COLOR_YELLOW,  COLOR_BLACK);
-  init_pair(colours_dark[ALL],  COLOR_GREEN,   COLOR_BLACK);
-  init_pair(colours_dark[BG],   COLOR_BLACK,   COLOR_BLACK);
-
-  init_pair(colours_bright[NONE], COLOR_BLACK,   COLOR_WHITE);
-  init_pair(colours_bright[FEW],  COLOR_MAGENTA, COLOR_WHITE);
-  init_pair(colours_bright[SOME], COLOR_RED,     COLOR_WHITE);
-  init_pair(colours_bright[MANY], COLOR_YELLOW,  COLOR_WHITE);
-  init_pair(colours_bright[LOTS], COLOR_BLUE,    COLOR_WHITE);
-  init_pair(colours_bright[ALL],  COLOR_CYAN,    COLOR_WHITE);
-  init_pair(colours_bright[BG],   COLOR_RED,     COLOR_WHITE);
+  render_init(mainwin);
 
   bool looping = true;
   while(looping) {

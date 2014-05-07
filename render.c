@@ -35,6 +35,33 @@ static bool hide = true;
 static bool bright = false;
 
 /**
+ * Initialise colours and get screen size
+ */
+void render_init(WINDOW* mainwin) {
+  // Get rendering area size
+  getmaxyx(mainwin, screen_height, screen_width);
+  screen_height --;
+
+  // Initialise colours
+  init_pair(colours_dark[NONE], COLOR_WHITE,   COLOR_BLACK);
+  init_pair(colours_dark[FEW],  COLOR_CYAN,    COLOR_BLACK);
+  init_pair(colours_dark[SOME], COLOR_MAGENTA, COLOR_BLACK);
+  init_pair(colours_dark[MANY], COLOR_BLUE,    COLOR_BLACK);
+  init_pair(colours_dark[LOTS], COLOR_YELLOW,  COLOR_BLACK);
+  init_pair(colours_dark[ALL],  COLOR_GREEN,   COLOR_BLACK);
+  init_pair(colours_dark[BG],   COLOR_BLACK,   COLOR_BLACK);
+
+  init_pair(colours_bright[NONE], COLOR_BLACK,   COLOR_WHITE);
+  init_pair(colours_bright[FEW],  COLOR_MAGENTA, COLOR_WHITE);
+  init_pair(colours_bright[SOME], COLOR_RED,     COLOR_WHITE);
+  init_pair(colours_bright[MANY], COLOR_YELLOW,  COLOR_WHITE);
+  init_pair(colours_bright[LOTS], COLOR_BLUE,    COLOR_WHITE);
+  init_pair(colours_bright[ALL],  COLOR_CYAN,    COLOR_WHITE);
+  init_pair(colours_bright[BG],   COLOR_RED,     COLOR_WHITE);
+
+}
+
+/**
  * Zoom in one step
  */
 void zoom_in() {

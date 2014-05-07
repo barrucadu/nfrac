@@ -1,6 +1,7 @@
 #ifndef __RENDER_H
 #define __RENDER_H
 
+#include <curses.h>
 #include <complex.h>
 
 /**
@@ -18,6 +19,11 @@
 #define LOTS 4
 #define ALL  5
 #define BG   6
+
+/**
+ * Initialise colours and get screen size
+ */
+void render_init(WINDOW* mainwin);
 
 /**
  * Zoom in one step
