@@ -125,7 +125,7 @@ static void render_fractal(double (*in_fractal) (complex double, const char *[],
       }
 
       // Select the char
-      char render = (distance < 0.5) ? '.' : '#';
+      char render = (in_frac < 0.5) ? '.' : '#';
 
       // Render the point
       if(cpair == colours[NONE] && hide) {
