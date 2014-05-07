@@ -69,7 +69,7 @@ static double complex pixel_topleft(int y, int x) {
  * Render a fractal to the screen, colouring by how many points per
  * pixel are in the fractal.
  */
-static void render_fractal(bool (*in_fractal) (complex double, const char *[], int),
+static void render_fractal(double (*in_fractal) (complex double, const char *[], int),
                            const char * frargv[], int frargn) {
   // Get the size of the grid
   double range_re = creal(bottomright) - creal(topleft);
@@ -82,8 +82,8 @@ static void render_fractal(bool (*in_fractal) (complex double, const char *[], i
   // Compute the fractal
   for(unsigned int y = 0; y < screen_height; y ++) {
     for(unsigned int x = 0; x < screen_width; x ++) {
-      // Compute how many points for this "pixel" are in the fractal.
-      unsigned int in = 0;
+      // The sum of distances
+      double distsum = 0.0;
 
       // Get the corner of this pixel
       double complex base = pixel_topleft((int)y, (int)x);
@@ -91,30 +91,29 @@ static void render_fractal(bool (*in_fractal) (complex double, const char *[], i
       for(unsigned int py = 0; py <= RESOLUTION; py ++) {
         for(unsigned int px = 0; px <= RESOLUTION; px ++) {
           double complex point = px * stepx + py * stepy * I;
-          if(in_fractal(base + point, frargv, frargn))
-            in ++;
+          distsum += in_fractal(base + point, frargv, frargn);
         }
       }
 
-      // Get the fraction of points which are in the fractal
-      double in_frac = (double)in / (double)(RESOLUTION * RESOLUTION);
+      // Get the average distance
+      double distance = distsum / (double)(RESOLUTION * RESOLUTION);
 
       // Select the colour
       short cpair = colours[ALL];
-      if(in_frac == 0) {
+      if(distance <= 0.1) {
         cpair = colours[NONE];
-      } else if(in_frac <= 0.2) {
+      } else if(distance <= 0.2) {
         cpair = colours[FEW];
-      } else if(in_frac <= 0.4) {
+      } else if(distance <= 0.4) {
         cpair = colours[SOME];
-      } else if(in_frac <= 0.6) {
+      } else if(distance <= 0.6) {
         cpair = colours[MANY];
-      } else if(in_frac <= 0.8) {
+      } else if(distance <= 0.8) {
         cpair = colours[LOTS];
       }
 
       // Select the char
-      char render = (in_frac < 0.5) ? '.' : '#';
+      char render = (distance < 0.5) ? '.' : '#';
 
       // Render the point
       if(cpair == colours[NONE] && hide) {
@@ -132,7 +131,7 @@ static void render_fractal(bool (*in_fractal) (complex double, const char *[], i
 
 int main(int argc, const char* argv[]) {
   // Get fractal renderer
-  bool (*renderer) (complex double, const char *[], int) = &in_mandlebrot;
+  double (*renderer) (complex double, const char *[], int) = &in_mandlebrot;
   const char** frargv = &argv[1];
   int frargc = argc - 1;
 

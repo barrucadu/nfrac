@@ -1,7 +1,6 @@
 #ifndef __MANDLEBROT_H
 #define __MANDLEBROT_H
 
-#include <stdbool.h>
 #include <complex.h>
 
 /**
@@ -12,7 +11,7 @@
 /**
  * Check if a point is in the Mandlebrot set.
  */
-bool in_mandlebrot(double complex z, const char* argv[], int argn);
-bool in_multibrot(double complex z, const char *argv[], int argn);
+double in_mandlebrot(double complex z, const char* argv[], int argn);
+double in_multibrot(double complex z, const char *argv[], int argn);
 
 #endif
