@@ -24,7 +24,7 @@ Controls
  - arrows: move display
  - +/-: zoom in/out
  - click: centre on the selected point
- - h: hide the background dots
+ - h: toggle background dots
  - b: toggle bright colours
  - r: reset to initial view
  - q: quit

@@ -41,7 +41,7 @@ double complex bottomright = 5.0 - 5.0 * I;
 /**
  * Whether to hide the background or not
  */
-bool hide = false;
+bool hide = true;
 
 /**
  * Whether to use bright colours or not
@@ -132,7 +132,7 @@ static void render_fractal(bool (*in_fractal) (complex double, const char *[], i
 
 int main(int argc, const char* argv[]) {
   // Get fractal renderer
-  bool (*renderer) (complex double, const char *[], int) = NULL;
+  bool (*renderer) (complex double, const char *[], int) = &in_mandlebrot;
   const char** frargv = &argv[1];
   int frargc = argc - 1;
 
