@@ -85,30 +85,42 @@ static void render_fractal(double (*in_fractal) (complex double, const char *[],
       // The sum of distances
       double distsum = 0.0;
 
+      // The number of points in the fractal
+      unsigned int in = 0;
+
       // Get the corner of this pixel
       double complex base = pixel_topleft((int)y, (int)x);
 
       for(unsigned int py = 0; py <= RESOLUTION; py ++) {
         for(unsigned int px = 0; px <= RESOLUTION; px ++) {
           double complex point = px * stepx + py * stepy * I;
-          distsum += in_fractal(base + point, frargv, frargn);
+          double dist = in_fractal(base + point, frargv, frargn);
+          distsum += dist;
+          if(dist == 1)
+            in ++;
         }
       }
 
       // Get the average distance
       double distance = distsum / (double)(RESOLUTION * RESOLUTION);
 
+      // Get the proportion in the fractal
+      double in_frac = (double)in / (double)(RESOLUTION * RESOLUTION);
+
+      // Get the colour metric
+      double colour_metric = (2.0 * distance + in_frac) / 3.0;
+
       // Select the colour
       short cpair = colours[ALL];
-      if(distance <= 0.1) {
+      if(colour_metric <= 0.1) {
         cpair = colours[NONE];
-      } else if(distance <= 0.2) {
+      } else if(colour_metric <= 0.2) {
         cpair = colours[FEW];
-      } else if(distance <= 0.4) {
+      } else if(colour_metric <= 0.4) {
         cpair = colours[SOME];
-      } else if(distance <= 0.6) {
+      } else if(colour_metric <= 0.6) {
         cpair = colours[MANY];
-      } else if(distance <= 0.8) {
+      } else if(colour_metric <= 0.8) {
         cpair = colours[LOTS];
       }
 
