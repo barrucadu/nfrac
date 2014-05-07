@@ -35,9 +35,17 @@ static bool hide = true;
 static bool bright = false;
 
 /**
+ * The curses window we render to
+ */
+WINDOW *win;
+
+/**
  * Initialise colours and get screen size
  */
-void render_init(WINDOW* mainwin) {
+void render_init(WINDOW *mainwin) {
+  // Save window
+  win = mainwin;
+
   // Get rendering area size
   getmaxyx(mainwin, screen_height, screen_width);
   screen_height --;
@@ -221,11 +229,11 @@ void render_fractal(double (*in_fractal) (complex double, const char *[], int),
       // Render the point
       if(cpair == colours[NONE] && hide) {
         attron(COLOR_PAIR(colours[BG]));
-        mvaddch(y, x, ' ');
+        mvwaddch(win, y, x, ' ');
         attroff(COLOR_PAIR(colours[BG]));
       } else {
         attron(COLOR_PAIR(cpair));
-        mvaddch(y, x, render);
+        mvwaddch(win, y, x, render);
         attroff(COLOR_PAIR(cpair));
       }
     }
@@ -240,5 +248,5 @@ void render_fractal(double (*in_fractal) (complex double, const char *[], int),
            bright ? " [b]" : "");
   move(screen_height, 0);
   clrtoeol();
-  mvaddstr(screen_height, 0, buf);
+  mvwaddstr(win, screen_height, 0, buf);
 }
