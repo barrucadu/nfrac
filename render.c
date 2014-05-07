@@ -226,16 +226,16 @@ void render_fractal(double (*in_fractal) (complex double, const char *[], int),
       // Select the char
       char render = (in_frac < 0.5) ? '.' : '#';
 
-      // Render the point
+      // Hide background
       if(cpair == colours[NONE] && hide) {
-        attron(COLOR_PAIR(colours[BG]));
-        mvwaddch(win, y, x, ' ');
-        attroff(COLOR_PAIR(colours[BG]));
-      } else {
-        attron(COLOR_PAIR(cpair));
-        mvwaddch(win, y, x, render);
-        attroff(COLOR_PAIR(cpair));
+        cpair = colours[BG];
+        render = ' ';
       }
+
+      // Render the point
+      attron(COLOR_PAIR(cpair));
+      mvwaddch(win, y, x, render);
+      attroff(COLOR_PAIR(cpair));
     }
   }
 
